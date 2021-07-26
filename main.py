@@ -1,3 +1,8 @@
+#TODO: Add docstrings to all the functions and classes.
+#TODO: Add a bunch more tags, should be easy.
+#WARNING: This is not a complete list of tags.
+#TODO: While adding new tags remember to add a style argument so users can add css to every element.
+
 class Page: #A page class, that actually generates the entire page source code and stores stuff like tags
     def __init__(self, title, body, stylesheets=[], scripts=[]):
         self.title = title
@@ -83,7 +88,3 @@ class Paragraph(Element):
     
     def source(self):
         return str(self)
-
-#TODO: Add a bunch more tags, should be easy.
-#WARNING: This is not a complete list of tags.
-#TODO: While adding new tags remember to add a style argument so users can add css to every element.
