@@ -104,3 +104,52 @@ class Link:
     
     def source(self):
         return str(self)
+    
+class Image:
+    def __init__(self, url, alt, styles=[]):
+        self.url = url
+        self.alt = alt
+        self.styles = ' '.join(styles) #joins a list of styles with a space for the style="" tag
+    
+    def __str__(self):
+        source = f'<img src="{self.url}" alt="{self.alt}" style="{self.styles}">'
+        return source
+    
+    def source(self):
+        return str(self)
+    
+class Table:
+    def __init__(self, legend, rows, styles=[]):
+        self.legend = legend
+        self.rows = rows
+        self.styles = ' '.join(styles) #joins a list of styles with a space for the style="" tag
+        
+    def __str__(self):
+        source = [f'<table style="{self.styles}">', '<tr>']
+        for lgn in self.legend:
+            source.append(f'<th>{lgn}</th>')
+        source.append('</tr>')
+        for row in self.rows:
+            source.append('<tr>')
+            for data in row:
+                source.append(f'<td>{data}</td>')
+        source.append('</tr>')
+        source.append('</table>')
+        return source
+    
+    def source(self):
+        return str(self)
+    
+class HorizontalLine():
+    def __str__(self):
+        return '<hr>'
+    
+    def source(self):
+        return str(self)
+
+class LineBreak():
+    def __str__(self):
+        return '<br>'
+    
+    def source(self):
+        return str(self)
