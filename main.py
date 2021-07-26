@@ -1,9 +1,8 @@
-#TODO: Add docstrings to all the functions and classes.
+#Add docstrings to all the functions and classes.
 #TODO: Add a bunch more tags, should be easy.
-#WARNING: This is not a complete list of tags.
-#TODO: While adding new tags remember to add a style argument so users can add css to every element.
+#TODO: While adding new tags remember to add a style argument so users can add css to every module.
 
-class Page: #A page class, that actually generates the entire page source code and stores stuff like tags
+class Page:
     def __init__(self, title, body, stylesheets=[], scripts=[]):
         self.title = title
         self.stylesheets = stylesheets
@@ -25,46 +24,50 @@ class Page: #A page class, that actually generates the entire page source code a
         source = f'<!DOCTYPE html>\n<html>\n<head>\n{linked_scripts}{linked_stylesheets}<title>{self.title}</title>\n</head>\n<body>\n{self.body}\n</body>\n</html>'
         return source
     
+    def __doc__():
+        return 'A page class, that generates the entire page source code and stores all modules in body while initiated!'
+    
     def source(self): #Repeating myself because sometimes referencing the instance does not return the __str__
         return str(self)
     
-class Body: #A body class, to compile all the elements into one body tag
-    def __init__(self, elements=[]):
-        self.elements = elements
+class Body:
+    def __init__(self, modules=[]):
+        self.modules = modules
     
     def __str__(self):
         source = []
-        for element in self.elements: #Loops through every element to be put in the body and adds its source code to a list
-            source.append(str(element))
-        source = '\n'.join(source) #Joins all the element source codes by newline
+        for module in self.modules: #Loops through every module to be put in the body and adds its source code to a list
+            source.append(str(module))
+        source = '\n'.join(source) #Joins all the module source codes by newline
         return source
+    
+    def __doc__():
+        return 'A body class, to compile all provided the modules into one body tag!'
     
     def source(self):
         return str(self)
 
 class Div: #Basically the same as the body class except it for divs 
-    def __init__(self, elements=[], id=None, styles=[]):
-        self.elements = elements
+    def __init__(self, modules=[], id=None, styles=[]):
+        self.modules = modules
         self.id = id
         self.styles = styles
     
     def __str__(self):
         source = [f'<div style="{" ".join(self.styles)}" id="{self.id}">'] #Creates the div tag with its styles and id
-        for element in self.elements: #Loops through every element in the div and adds its source code to the list
-            source.append(str(element))
+        for module in self.modules: #Loops through every module in the div and adds its source code to the list
+            source.append(str(module))
         source.append('</div>') #Ends div tag 
-        source = '\n'.join(source) #Joins all the element source codes by newline
+        source = '\n'.join(source) #Joins all the module source codes by newline
         return source
+    
+    def __doc__():
+        return 'A div class to combine modules into a block, like the Body class.'
     
     def source(self):
         return str(self)
 
-class Element: #TODO: Remove because this is useless.
-    def __init__(self, classes=[], ids=[]):
-        self.classes = ' '.join(classes)
-        self.ids = ' '.join(ids)
-
-class Heading(Element):
+class Heading:
     def __init__(self, text, level=1, styles=[]):
         self.text = text
         self.level = level
@@ -77,13 +80,26 @@ class Heading(Element):
     def source(self):
         return str(self)
     
-class Paragraph(Element):
+class Paragraph:
     def __init__(self, text, styles=[]):
         self.text = text
         self.styles = ' '.join(styles) #joins a list of styles with a space for the style="" tag
     
     def __str__(self):
         source = f'<p style="{self.styles}">{self.text}</p>'#Creates the paragraph tag with its styles and text
+        return source
+    
+    def source(self):
+        return str(self)
+    
+class Link:
+    def __init__(self, url, text, styles=[]):
+        self.url = url
+        self.text = text
+        self.styles = ' '.join(styles) #joins a list of styles with a space for the style="" tag
+
+    def __str__(self):
+        source = f'<a href="{self.url}" style="{self.styles}">{self.text}</a>'
         return source
     
     def source(self):
