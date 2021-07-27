@@ -1,5 +1,3 @@
-#Add docstrings to all the functions and classes.
-#TODO: Add a bunch more tags, should be easy.
 #TODO: While adding new tags remember to add a style argument so users can add css to every module.
 
 class Page:
