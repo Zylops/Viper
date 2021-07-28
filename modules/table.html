@@ -1,0 +1,13 @@
+<table style="{{properties.styles}}" class="{{properties.classes}}" id={{properties.id}}>
+    <tr>
+        {% for header in headers %}
+        <th>{{header}}</th>
+        {% endfor %}
+    </tr>
+    <tr>
+        {% for row in rows %}
+        <td>{{row}}</td>
+        {% endfor %}
+    </tr>
+    
+</table>

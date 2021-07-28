@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+    <html>
+        <head>
+            {% for script in scripts %}
+                <script src="{{ script }}"></script>
+            {% endfor %}
+
+            {% for sheet in stylesheets %}
+                <link rel="stylesheet" href="{{ sheet }}">
+            {% endfor %}
+            
+            <title>{{title}}</title>
+        </head>
+        
+        <body>
+        {{body | safe }}
+        </body>
+
+    </html>

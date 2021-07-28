@@ -1,6 +1,13 @@
 #TODO: While adding new tags remember to add a style argument so users can add css to every module.
 
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+env = Environment(
+    loader = FileSystemLoader("modules"),
+    autoescape=select_autoescape()
+)
+
 class Page:
+    
     def __init__(self, title, body, stylesheets=[], scripts=[]):
         self.title = title
         self.stylesheets = stylesheets
@@ -8,18 +15,9 @@ class Page:
         self.body = body
     
     def __str__(self):
-        linked_scripts = []
-        for script in self.scripts: #Loops through all scripts and adds them to the list with their tags
-            linked_scripts.append(f'<script>{script}</script>')
-        linked_scripts = '\n'.join(linked_scripts) #Joins list with all tags by newline 
-        
-        linked_stylesheets = []
-        for sheet in self.stylesheets: #Loops through all stylesheets and adds them to the list with their tags we then join to make the style tag
-            linked_stylesheets.append(f'<link rel="stylesheet" href="{sheet}">')
-        linked_stylesheets = '\n'.join(linked_stylesheets) #Joins list with all tags by newline 
-        
+        page_module = env.get_template("page.html")
         # Actually generates source code with all the tags and widgets
-        source = f'<!DOCTYPE html>\n<html>\n<head>\n{linked_scripts}{linked_stylesheets}<title>{self.title}</title>\n</head>\n<body>\n{self.body}\n</body>\n</html>'
+        source = page_module.render(scripts=self.scripts, stylesheets=self.stylesheets, title=self.title, body=self.body)
         return source
     
     def __doc__():
@@ -33,10 +31,8 @@ class Body:
         self.modules = modules
     
     def __str__(self):
-        source = []
-        for module in self.modules: #Loops through every module to be put in the body and adds its source code to a list
-            source.append(str(module))
-        source = '\n'.join(source) #Joins all the module source codes by newline
+        body_module = env.get_template("body.html")
+        source = body_module.render(modules=self.modules)
         return source
     
     def __doc__():
@@ -49,14 +45,11 @@ class Div: #Basically the same as the body class except it for divs
     def __init__(self, modules=[], id=None, styles=[]):
         self.modules = modules
         self.id = id
-        self.styles = styles
+        self.styles = ' '.join(styles)
     
     def __str__(self):
-        source = [f'<div style="{" ".join(self.styles)}" id="{self.id}">'] #Creates the div tag with its styles and id
-        for module in self.modules: #Loops through every module in the div and adds its source code to the list
-            source.append(str(module))
-        source.append('</div>') #Ends div tag 
-        source = '\n'.join(source) #Joins all the module source codes by newline
+        div_module = env.get_template("div.html")
+        source = div_module.render(modules=self.modules, id=self.id, styles=self.styles)
         return source
     
     def __doc__():
@@ -65,79 +58,81 @@ class Div: #Basically the same as the body class except it for divs
     def source(self):
         return str(self)
 
-class Heading:
-    def __init__(self, text, level=1, styles=[]):
+class Module:
+    def __init__(self, styles=[], id=None, classes=[]):
+        self.styles = ' '.join(styles)
+        self.id = id
+        self.classes = ' '.join(classes)
+
+class Heading(Module):
+    def __init__(self, text, level=1, styles=[], id=None, classes=[]):
         self.text = text
         self.level = level
-        self.styles = ' '.join(styles) #joins a list of styles with a space for the style="" tag
+        self.properties = Module(styles, id, classes)
     
     def __str__(self):
-        source = f'<h{self.level} style="{self.styles}">{self.text}</h{self.level}>' #Creates the heading tag with its level (h1 , h2, h3, etc), styles and text
+        heading_module = env.get_template("heading.html")
+        source = heading_module.render(text=self.text, level=self.level, properties=self.properties)
         return source
     
     def source(self):
         return str(self)
     
 class Paragraph:
-    def __init__(self, text, styles=[]):
+    def __init__(self, text, styles=[], id=None, classes=[]):
         self.text = text
-        self.styles = ' '.join(styles) #joins a list of styles with a space for the style="" tag
+        self.properties = Module(styles, id, classes)
     
     def __str__(self):
-        source = f'<p style="{self.styles}">{self.text}</p>'#Creates the paragraph tag with its styles and text
+        paragraph_module = env.get_template("paragraph.html")
+        source = paragraph_module.render(text=self.text, properties=self.properties)
         return source
     
     def source(self):
         return str(self)
     
 class Link:
-    def __init__(self, url, text, styles=[]):
+    def __init__(self, url, text, styles=[], id=None, classes=[]):
         self.url = url
         self.text = text
-        self.styles = ' '.join(styles) #joins a list of styles with a space for the style="" tag
+        self.properties = Module(styles, id, classes)
 
     def __str__(self):
-        source = f'<a href="{self.url}" style="{self.styles}">{self.text}</a>'
+        link_module = env.get_template("link.html")
+        source = link_module.render(url=self.url, text=self.text, properties=self.properties)
         return source
     
     def source(self):
         return str(self)
     
 class Image:
-    def __init__(self, url, alt, styles=[]):
+    def __init__(self, url, alt='', styles=[], id=None, classes=[]):
         self.url = url
         self.alt = alt
-        self.styles = ' '.join(styles) #joins a list of styles with a space for the style="" tag
+        self.properties = Module(styles, id, classes)
     
     def __str__(self):
-        source = f'<img src="{self.url}" alt="{self.alt}" style="{self.styles}">'
+        image_module = env.get_template("image.html")
+        source = image_module.render(url=self.url, alt=self.alt, properties=self.properties)
         return source
     
     def source(self):
         return str(self)
     
 class Table:
-    def __init__(self, legend, rows, styles=[]):
-        self.legend = legend
+    def __init__(self, headers, rows, styles=[], id=None, classes=[]):
+        self.headers = headers
         self.rows = rows
-        self.styles = ' '.join(styles) #joins a list of styles with a space for the style="" tag
+        self.properties = Module(styles, id, classes)
         
     def __str__(self):
-        source = [f'<table style="{self.styles}">', '<tr>']
-        for lgn in self.legend:
-            source.append(f'<th>{lgn}</th>')
-        source.append('</tr>')
-        for row in self.rows:
-            source.append('<tr>')
-            for data in row:
-                source.append(f'<td>{data}</td>')
-        source.append('</tr>')
-        source.append('</table>')
+        table_module = env.get_template("table.html")
+        source = table_module.render(headers=self.headers, rows=self.rows, properties=self.properties)
         return source
     
     def source(self):
         return str(self)
-    
+
 class HorizontalLine():
     def __str__(self):
         return '<hr>'

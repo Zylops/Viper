@@ -1,0 +1,5 @@
+<div style="{{styles}}" id={{id}}>
+    {% for module in modules %}
+        {{ module.source() | safe }}
+    {% endfor %}
+</div>
